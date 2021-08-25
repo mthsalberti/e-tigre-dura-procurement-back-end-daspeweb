@@ -18,7 +18,7 @@ functions:
       aws_region: ${self:custom.region}
     events:
       - http:
-          path: getById/{table}/{id}
+          path: /{table}/{id}
           method: get
           cors:
             origin: '*'
@@ -26,15 +26,16 @@ functions:
             type: COGNITO_USER_POOLS
             authorizerId:
               Ref: ApiGatewayAuthorizer
+  #  changed to 'codition'
   getCollection:
-    handler: src/functions/select/getBy.collection
+    handler: src/functions/select/getBy.condition
     runtime: nodejs14.x
     timeout: 20
     environment:
       aws_region: ${self:custom.region}
     events:
       - http:
-          path: getCollection/{table}
+          path: /{table}
           method: get
           cors:
             origin: '*'
@@ -42,6 +43,7 @@ functions:
             type: COGNITO_USER_POOLS
             authorizerId:
               Ref: ApiGatewayAuthorizer
+  #  test
   deleteById:
     handler: src/functions/delete/deleteBy.id
     runtime: nodejs14.x
@@ -50,30 +52,31 @@ functions:
       aws_region: ${self:custom.region}
     events:
       - http:
-          path: deleteById/{table}/{id}
-          method: get
+          path: /{table}/{id}
+          method: delete
           cors:
             origin: '*'
           authorizer:
             type: COGNITO_USER_POOLS
             authorizerId:
-              Ref: ApiGatewayAuthorizer
-  getByCondiction:
-    handler: src/functions/select/getBy.condition
-    runtime: nodejs14.x
-    timeout: 20
-    environment:
-      aws_region: ${self:custom.region}
-    events:
-      - http:
-          path: getByCondiction/{table}/
-          method: get
-          cors:
-            origin: '*'
-          authorizer:
-            type: COGNITO_USER_POOLS
-            authorizerId:
-              Ref: ApiGatewayAuthorizer
+              Ref: ApiGatewayAuthorizer teste
+  #  now, 'collection' work as codition
+  #  getByCondiction:
+  #    handler: src/functions/select/getBy.condition
+  #    runtime: nodejs14.x
+  #    timeout: 20
+  #    environment:
+  #      aws_region: ${self:custom.region}
+  #    events:
+  #      - http:
+  #          path: getByCondiction/{table}/
+  #          method: get
+  #          cors:
+  #            origin: '*'
+  #          authorizer:
+  #            type: COGNITO_USER_POOLS
+  #            authorizerId:
+  #              Ref: ApiGatewayAuthorizer
   insert:
     handler: src/functions/insert/create.insert
     runtime: nodejs14.x
@@ -82,7 +85,7 @@ functions:
       aws_region: ${self:custom.region}
     events:
       - http:
-          path: create/{table}/
+          path: /{table}
           method: post
           cors:
             origin: '*'
@@ -91,15 +94,15 @@ functions:
             authorizerId:
               Ref: ApiGatewayAuthorizer
   update:
-    handler: src/functions/update/update.change
+    handler: src/functions/update/update.upsert
     runtime: nodejs14.x
     timeout: 20
     environment:
       aws_region: ${self:custom.region}
     events:
       - http:
-          path: update/{table}/{id}
-          method: post
+          path: /{table}
+          method: put
           cors:
             origin: '*'
           authorizer:

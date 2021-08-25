@@ -49,11 +49,32 @@ const getFetchParams = (event, config) => {
 
     return { page, limit, orderBy, orderDirection, isPagination, filters }
 }
+const related = async ({toRelated, data}) => {
+    return Promise.all(toRelated.map(c => {
+        return new Promise(async  (resolve, reject) => {
+            try {
+                for (let i = 0; i < data.length; i++) {
+                    data[i][c.alias] = await context.db(c.table).where(c.to, data[i][c.from])
+                    if (c.column_merge && data[i][c.alias].length === 1) {
+                        data[i][`${c.table}_${c.column_merge}`] = data[i][c.alias][0][c.column_merge]
+                    }
+                }
+            }
+            catch (e) {
+                console.log("ERROR on get related", e)
+            }
+            finally {
+                resolve(data)
+            }
+        })
+    }))
+};
 
 module.exports = {
     responseCross,
     getFetchParams,
     formatResultById,
     formatActive,
-    formatResultArray
+    formatResultArray,
+    related
 }
