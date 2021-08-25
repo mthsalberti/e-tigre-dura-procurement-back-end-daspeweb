@@ -15,5 +15,8 @@
     "express": "^4.17.1",
     "knex": "^0.95.6",
     "mysql": "^2.18.1"
+  },
+  "devDependencies": {
+    "serverless-offline": "^8.0.0"
   }
 }

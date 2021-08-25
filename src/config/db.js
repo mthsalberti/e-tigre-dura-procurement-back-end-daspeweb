@@ -1,3 +1,4 @@
+require('dotenv').config()
 const config = require('../../knexfile')
 console.log('config:', config)
 console.log('process.env:', process.env.NODE_ENV)
