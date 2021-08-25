@@ -15,8 +15,7 @@ exports.id = async (event, context) => middleware(event, context, async (event, 
             return success({ data })
         }
     } catch (e) {
-        console.log(e)
-        //return error(e)
+        return error(e)
     }
 });
 
@@ -33,8 +32,7 @@ exports.collection = async (event, context) => middleware(event, context, async 
            return success({ data })
        }
    } catch (e) {
-       console.log(e)
-       //return error(e)
+       return error(e)
    }   
 });
 

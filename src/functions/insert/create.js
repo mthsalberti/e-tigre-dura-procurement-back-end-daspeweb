@@ -1,4 +1,3 @@
-const { tableNameUser, tableNameWorkCenter } = require('../../config/tables')
 const { formatResultById, formatResultArray } = require('../../helpers/utils')
 const { middleware } = require('../../helpers/middleware')
 
@@ -6,12 +5,10 @@ exports.insert = async (event, context) => middleware(event, context, async (eve
     try {
         let { table } = event.pathParameters;
         let body =  JSON.parse(event.body)
-        let data = await context.db(table).insert(body)
-
-        data = formatResultArray(data)
-
+        const [id]  = await context.db(table).insert(body)
+        let data = await context.db(table).where('id', id)
+        data = formatResultById(data)
         return success({ data })
-
     } catch (e) {
         console.log(e)
             //return error(e)
