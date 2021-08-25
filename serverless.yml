@@ -10,9 +10,99 @@ provider:
   runtime: nodejs12.x
 
 functions:
-  hello:
-    handler: handler.hello
+  getById:
+    handler: src/functions/select/getBy.id
+    runtime: nodejs14.x
+    timeout: 20
+    environment:
+      aws_region: ${self:custom.region}
     events:
       - http:
-          path: hello
+          path: getById/{table}/{id}
           method: get
+          cors:
+            origin: '*'
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: ApiGatewayAuthorizer
+  getCollection:
+    handler: src/functions/select/getBy.collection
+    runtime: nodejs14.x
+    timeout: 20
+    environment:
+      aws_region: ${self:custom.region}
+    events:
+      - http:
+          path: getCollection/{table}
+          method: get
+          cors:
+            origin: '*'
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: ApiGatewayAuthorizer
+  deleteById:
+    handler: src/functions/delete/deleteBy.id
+    runtime: nodejs14.x
+    timeout: 20
+    environment:
+      aws_region: ${self:custom.region}
+    events:
+      - http:
+          path: deleteById/{table}/{id}
+          method: get
+          cors:
+            origin: '*'
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: ApiGatewayAuthorizer
+  getByCondiction:
+    handler: src/functions/select/getBy.condition
+    runtime: nodejs14.x
+    timeout: 20
+    environment:
+      aws_region: ${self:custom.region}
+    events:
+      - http:
+          path: getByCondiction/{table}/
+          method: get
+          cors:
+            origin: '*'
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: ApiGatewayAuthorizer
+  insert:
+    handler: src/functions/insert/create.insert
+    runtime: nodejs14.x
+    timeout: 20
+    environment:
+      aws_region: ${self:custom.region}
+    events:
+      - http:
+          path: create/{table}/
+          method: post
+          cors:
+            origin: '*'
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: ApiGatewayAuthorizer
+  update:
+    handler: src/functions/update/update.change
+    runtime: nodejs14.x
+    timeout: 20
+    environment:
+      aws_region: ${self:custom.region}
+    events:
+      - http:
+          path: update/{table}/{id}
+          method: post
+          cors:
+            origin: '*'
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: ApiGatewayAuthorizer

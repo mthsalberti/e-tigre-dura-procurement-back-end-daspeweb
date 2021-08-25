@@ -161,7 +161,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/etigre-dura-procurement-back-end/dev/1629492555221-2021-08-20T20:49:15.221Z/etigre-dura-procurement-back-end.zip"
+          "S3Key": "serverless/etigre-dura-procurement-back-end/dev/1629730456768-2021-08-23T14:54:16.768Z/etigre-dura-procurement-back-end.zip"
         },
         "Handler": "handler.hello",
         "Runtime": "nodejs12.x",
@@ -179,14 +179,14 @@
         "HelloLogGroup"
       ]
     },
-    "HelloLambdaVersionoeOXZAx9nd8rztJMkinGuQYsgJ2Hym1X2LxPRrYDm4": {
+    "HelloLambdaVersion7SqjWzTqlmdALAL0IjK9ZriKZ9KgwDoH77xMCRhj3UQ": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "HelloLambdaFunction"
         },
-        "CodeSha256": "eyIbaAjMSNSG5OZViFJPgPUusFJkozgWiSh85A17zQk="
+        "CodeSha256": "t/WZ5jE0NWVRo9WUe4DTznQOcjRPtMCu7HhXlCWTg20="
       }
     },
     "ApiGatewayRestApi": {
@@ -262,7 +262,7 @@
         "HelloLambdaPermissionApiGateway"
       ]
     },
-    "ApiGatewayDeployment1629492544629": {
+    "ApiGatewayDeployment1629730444086": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -324,7 +324,7 @@
     "HelloLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "HelloLambdaVersionoeOXZAx9nd8rztJMkinGuQYsgJ2Hym1X2LxPRrYDm4"
+        "Ref": "HelloLambdaVersion7SqjWzTqlmdALAL0IjK9ZriKZ9KgwDoH77xMCRhj3UQ"
       },
       "Export": {
         "Name": "sls-etigre-dura-procurement-back-end-dev-HelloLambdaFunctionQualifiedArn"
