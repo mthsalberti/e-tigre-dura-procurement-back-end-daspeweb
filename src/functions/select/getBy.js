@@ -4,36 +4,14 @@ const {middleware} = require('../../helpers/middleware')
 
 exports.id = async (event, context) => middleware(event, context, async (event, context, error, success) => {
     try {
+
         let {table, id} = event.pathParameters;
-        if (id == null) {
-            let data = await context.db(table).limit(15);
-            data = formatResultArray(data)
-            return success({data})
-        } else {
-            let buildBase64 = (json) => Buffer.from(JSON.stringify(json))
-            let withToParse = event.queryStringParameters ? (event.queryStringParameters['with'] ?? buildBase64([])) : buildBase64([])
-            let data = await context.db(table).where('id', id);
-            let children = await Promise.all(JSON.parse(Buffer.from(withToParse, 'base64').toString()).map(c => {
-                return new Promise(async  (resolve, reject) => {
-                    try {
-                        for (let i = 0; i < data.length; i++) {
-                            data[i][c.alias] = await context.db(c.table).where(c.to, data[i][c.from])
-                            if (c.column_merge && data[i][c.alias].length === 1) {
-                                data[i][`${c.table}_${c.column_merge}`] = data[i][c.alias][0][c.column_merge]
-                            }
-                        }
-                    }
-                    catch (e) {
-                        console.log("ERROR on get related", e)
-                    }
-                    finally {
-                        resolve(data)
-                    }
-                })
-            }))
-            data = formatResultById(data)
-            return success({data, children})
-        }
+        let data = await context.db.select('*')
+            .from(table)
+            .where('id', id)
+
+        data = formatResultById(data)
+        return success({data})
     } catch (e) {
         return error(e)
     }
@@ -64,6 +42,7 @@ exports.condition = async (event, context) => middleware(event, context, async (
         let {table} = event.pathParameters;
         let whereToParse = event.queryStringParameters ? (event.queryStringParameters['where'] ?? buildBase64([])) : buildBase64([])
         let withToParse = event.queryStringParameters ? (event.queryStringParameters['with'] ?? buildBase64([])) : buildBase64([])
+        console.log("whereToParse", JSON.parse(Buffer.from(whereToParse, 'base64').toString()))
 
         let condition = JSON.parse(Buffer.from(whereToParse, 'base64').toString());
         let data = formatResultArray(await context.db(table)
@@ -74,26 +53,50 @@ exports.condition = async (event, context) => middleware(event, context, async (
                 return builder
             }))
 
-        let children = await Promise.all(JSON.parse(Buffer.from(withToParse, 'base64').toString()).map(c => {
-            return new Promise(async  (resolve, reject) => {
-                try {
-                    for (let i = 0; i < data.length; i++) {
-                        data[i][c.alias] = await context.db(c.table).where(c.to, data[i][c.from])
-                        if (c.column_merge && data[i][c.alias].length === 1) {
-                            data[i][`${c.table}_${c.column_merge}`] = data[i][c.alias][0][c.column_merge]
-                        }
-                    }
-                }
-                catch (e) {
-                    console.log("ERROR on get related", e)
-                }
-                finally {
-                    resolve(data)
-                }
-            })
-        }))
+        return success({data})
 
-        return success({data, children})
+    } catch (e) {
+        console.log('error on get', e)
+        return error(e)
+    }
+});
+
+exports.purchaseFromStatus = async (event, context) => middleware(event, context, async (event, context, error, success) => {
+    try {
+        // with [{table, from, to, alias, column_merge}]
+
+        let buildBase64 = (json) => Buffer.from(JSON.stringify(json))
+        let id = event.pathParameters?.id;
+        let data;
+        console.log('id', id)
+        if (id !== undefined) {
+            data = formatResultArray(await context.db.raw(`SELECT pc.* , 
+\tDATE_FORMAT(pc.delivery_forecast , '%Y-%m-%d') as delivery_forecast, 
+    v.name as vendor_name, 
+    dp.description as department_description, 
+    pcs.description as status_description , 
+    department_requested_by.description as department_requested_by_description, 
+    department_created_by.description as department_created_by_description,
+    user_requested_by.name as requested_by_name, 
+    user_created_by.name as created_by_name,
+    user_designated_receiver.name as designated_receiver_name
+FROM
+\tvendor v, department dp, purchase_status pcs, purchase pc 
+LEFT JOIN user as user_requested_by ON pc.requested_by = user_requested_by.id 
+LEFT JOIN user as user_created_by ON pc.createdBy = user_created_by.id     
+LEFT JOIN user as user_designated_receiver ON pc.designated_receiver_id = user_designated_receiver.id     
+LEFT JOIN department as department_requested_by ON pc.requested_by_department = department_requested_by.id 
+LEFT JOIN department as department_created_by ON pc.created_by_department = department_created_by.id 
+WHERE pcs.id = pc.status_id 
+\tAND pc.created_by_department = dp.id 
+    AND pc.vendor_id = v.id AND pc.id = ${id}`))
+        } else {
+            // data = await context.db.raw(`SELECT pc.id ,v.name, dp.description, pcs.description  vendor v, department dp, purchase_status pcs, purchase pc  pcs.id = pc.status_id AND pc.created_by_department = dp.id AND pc.vendor_id = v.id `)
+            data = await context.db.raw(`SELECT pc.id , pc.total_cost, v.name as vendor_name, dp.description as created_by_department_description, pcs.description as status_description FROM vendor v, department dp, purchase_status pcs, purchase pc WHERE pcs.id = pc.status_id AND pc.created_by_department = dp.id AND pc.vendor_id = v.id `)
+        }
+
+
+        return success(data)
 
     } catch (e) {
         console.log('error on get', e)
