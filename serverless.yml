@@ -45,14 +45,14 @@ functions:
               Ref: ApiGatewayAuthorizer
   #  test
   deleteById:
-    handler: src/functions/delete/deleteBy.id
+    handler: src/functions/delete/deleteBy.deletePurchaseById
     runtime: nodejs14.x
     timeout: 20
     environment:
       aws_region: ${self:custom.region}
     events:
       - http:
-          path: /{table}/{id}
+          path: /delete_purchase/{id}
           method: delete
           cors:
             origin: '*'
@@ -125,15 +125,15 @@ functions:
             type: COGNITO_USER_POOLS
             authorizerId:
               Ref: ApiGatewayAuthorizer
-  getPurchaseFromStatus:
-    handler: src/functions/select/getBy.purchaseFromStatus
+  purchaseItemsFromPurchaseId:
+    handler: src/functions/select/getBy.purchaseItemsFromPurchaseId
     runtime: nodejs14.x
     timeout: 20
     environment:
       aws_region: ${self:custom.region}
     events:
       - http:
-          path: /custom/purchase/{id}
+          path: /custom/purchase_item_from_purchase/{id}
           method: get
           cors:
             origin: '*'
@@ -141,3 +141,19 @@ functions:
             type: COGNITO_USER_POOLS
             authorizerId:
               Ref: ApiGatewayAuthorizer
+              getPurchaseFromStatus:
+                handler: src/functions/select/getBy.purchaseFromStatus
+                runtime: nodejs14.x
+                timeout: 20
+                environment:
+                  aws_region: ${self:custom.region}
+                events:
+                  - http:
+                      path: /custom/purchase/{id}
+                      method: get
+                      cors:
+                        origin: '*'
+                      authorizer:
+                        type: COGNITO_USER_POOLS
+                        authorizerId:
+                          Ref: ApiGatewayAuthorizer

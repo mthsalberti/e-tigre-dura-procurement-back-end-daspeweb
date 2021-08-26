@@ -4,7 +4,6 @@ const {middleware} = require('../../helpers/middleware')
 
 exports.id = async (event, context) => middleware(event, context, async (event, context, error, success) => {
     try {
-
         let {table, id} = event.pathParameters;
         let data = await context.db.select('*')
             .from(table)
@@ -96,6 +95,19 @@ WHERE pcs.id = pc.status_id
         }
 
 
+        return success(data)
+
+    } catch (e) {
+        console.log('error on get', e)
+        return error(e)
+    }
+});
+
+exports.purchaseItemsFromPurchaseId = async (event, context) => middleware(event, context, async (event, context, error, success) => {
+    try {
+        let id = event.pathParameters?.id;
+        let data = await context
+            .db.raw(`SELECT pi.*, dp.description as department_description FROM purchase_item as pi LEFT JOIN department as dp ON pi.department_id = dp.id WHERE purchase_id = ${id}`)
         return success(data)
 
     } catch (e) {
