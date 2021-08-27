@@ -157,3 +157,19 @@ functions:
             type: COGNITO_USER_POOLS
             authorizerId:
               Ref: ApiGatewayAuthorizer
+  search:
+    handler: src/functions/select/getBy.search
+    runtime: nodejs14.x
+    timeout: 20
+    environment:
+      aws_region: ${self:custom.region}
+    events:
+      - http:
+          path: /search/{table}/{field}/{term}
+          method: get
+          cors:
+            origin: '*'
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: ApiGatewayAuthorizer

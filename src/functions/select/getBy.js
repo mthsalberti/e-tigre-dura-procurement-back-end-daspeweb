@@ -115,3 +115,15 @@ exports.purchaseItemsFromPurchaseId = async (event, context) => middleware(event
         return error(e)
     }
 });
+
+exports.search = async (event, context) => middleware(event, context, async (event, context, error, success) => {
+    try {
+        let {table, field, term} = event.pathParameters
+        let data = await context.db.select(['id', field]).from(table).where(field, 'like', `%${term}%`).limit(10)
+        return success(data)
+
+    } catch (e) {
+        console.log('error on get', e)
+        return error(e)
+    }
+});
